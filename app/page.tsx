@@ -1,17 +1,50 @@
-import { getQueryClient, trpc } from "./trpc/server";
-import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
-import Client from "./client";
+// import { Button } from "@/components/ui/button";
+// import { authClient } from "@/lib/auth-client";
+"use client";
+
+import { requireAuth } from "@/lib/auth-utils";
+import { caller } from "./trpc/server";
+import Logout from "./features/auth/components/logout";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useTRPC } from "./trpc/client";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 const page = () => {
-  const queryClient = getQueryClient();
+  // await requireAuth();
+  const queryClient = useQueryClient();
+  const trpc = useTRPC();
+  const { data } = useQuery(trpc.getWorkflows.queryOptions());
 
-  void queryClient.prefetchQuery(trpc.getUsers.queryOptions());
+  const testAi = useMutation(
+    trpc.testAi.mutationOptions({
+      onSuccess: () => {
+        toast.success("Ai tested");
+      },
+      onError: () => {
+        toast.error("Ai failed");
+      },
+    })
+  );
 
+  const create = useMutation(
+    trpc.createWorkflows.mutationOptions({
+      onSuccess: () => {
+        toast.success("Job queued");
+      },
+    })
+  );
   return (
-    <div className="min-h-screen min-w-screen flex items-center justify-center">
-      <HydrationBoundary state={dehydrate(queryClient)}>
-        <Client />
-      </HydrationBoundary>
+    <div className="min-h-screen min-w-screen flex items-center justify-center flex-col gap-y-6">
+      protected page
+      <div>{JSON.stringify(data, null, 2)}</div>
+      <Button disabled={create.isPending} onClick={() => create.mutate()}>
+        Create Workflow
+      </Button>
+      <Button disabled={testAi.isPending} onClick={() => testAi.mutate()}>
+        Test Ai
+      </Button>
+      <Logout />
     </div>
   );
 };
