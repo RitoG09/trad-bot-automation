@@ -1,6 +1,11 @@
 "use client";
 
-import { EntityContainer, EntityHeader } from "@/components/entity-components";
+import {
+  EntityContainer,
+  EntityHeader,
+  EntityPagination,
+  EntitySearch,
+} from "@/components/entity-components";
 import {
   useCreateWorkflow,
   useSuspenseWorkflows,
@@ -10,6 +15,23 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import { useTRPC } from "@/app/trpc/client";
+import { useWorkflowsParams } from "../hooks/use-workflows-params";
+import { UseEntitySearch } from "@/hooks/use-entity-seach";
+
+export const WorkflowsSearch = () => {
+  const [params, setParams] = useWorkflowsParams();
+  const { searchValue, onSearchChange } = UseEntitySearch({
+    params,
+    setParams,
+  });
+  return (
+    <EntitySearch
+      value={searchValue}
+      onChange={onSearchChange}
+      placeholder="Search workflows"
+    />
+  );
+};
 
 export const WorkflowsList = () => {
   const workflows = useSuspenseWorkflows();
@@ -52,6 +74,20 @@ export const WorkflowsHeader = ({ disabled }: { disabled?: boolean }) => {
   );
 };
 
+export const WorkflowsPagination = () => {
+  const workflows = useSuspenseWorkflows();
+  const [params, setParams] = useWorkflowsParams();
+
+  return (
+    <EntityPagination
+      disabled={workflows.isFetching}
+      totalPages={workflows.data.totalPages}
+      page={workflows.data.page}
+      onPageChange={(page) => setParams({ ...params, page })}
+    />
+  );
+};
+
 export const WorkflowsContainer = ({
   children,
 }: {
@@ -60,8 +96,8 @@ export const WorkflowsContainer = ({
   return (
     <EntityContainer
       header={<WorkflowsHeader />}
-      search={<></>}
-      pagination={<></>}
+      search={<WorkflowsSearch />}
+      pagination={<WorkflowsPagination />}
     >
       {children}
     </EntityContainer>
