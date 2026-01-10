@@ -78,8 +78,44 @@ export const workflowsRouter = createTRPCRouter({
       });
       // Transaction to ensure consistency
       return await prisma.$transaction(async (tx) => {
-        // Delete all existing nodes
-      })
+        // Delete all existing nodes (cascade delete connections)
+        await tx.node.deleteMany({
+          where: {
+            workflowId: id,
+          },
+        });
+        // Create new nodes
+        await tx.node.createMany({
+          data: nodes.map((node) => ({
+            id: node.id,
+            workflowId: id,
+            name: node.type || "unknown",
+            type: node.type as NodeType,
+            position: node.position,
+            data: node.data || {},
+          })),
+        });
+        // Create new connections
+        await tx.connection.createMany({
+          data: edges.map((edge) => ({
+            workflowId: id,
+            fromNodeId: edge.source,
+            toNodeId: edge.target,
+            fromOutput: edge.sourceHandle || "main",
+            toInput: edge.targetHandle || "main",
+          })),
+        });
+        // Update workflow'supdatedAt timestamp
+        await tx.workflow.update({
+          where: {
+            id,
+          },
+          data: {
+            updatedAt: new Date(),
+          },
+        });
+        return workflow;
+      });
     }),
   getOne: protectedProcedure
     .input(z.object({ id: z.string() }))

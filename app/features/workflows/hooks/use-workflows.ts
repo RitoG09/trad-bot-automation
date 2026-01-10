@@ -84,22 +84,22 @@ export const useUpdateWorkflowName = () => {
 };
 
 //hooks to update a worklow
-// export const useUpdateWorkflow = () => {
-//   const queryClient = useQueryClient();
-//   const trpc = useTRPC();
+export const useUpdateWorkflow = () => {
+  const queryClient = useQueryClient();
+  const trpc = useTRPC();
 
-//   return useMutation(
-//     trpc.workflows.update.mutationOptions({
-//       onSuccess: (data) => {
-//         toast.success(`Workflow "${data.name}" updated`);
-//         queryClient.invalidateQueries(trpc.workflows.getMany.queryOptions({}));
-//         queryClient.invalidateQueries(
-//           trpc.workflows.getOne.queryFilter({ id: data.id })
-//         );
-//       },
-//       onError: (error) => {
-//         toast.error(`Failed to update workflow: ${error.message}`);
-//       },
-//     })
-//   );
-// };
+  return useMutation(
+    trpc.workflows.update.mutationOptions({
+      onSuccess: (data) => {
+        toast.success(`Workflow "${data.name}" saved`);
+        queryClient.invalidateQueries(trpc.workflows.getMany.queryOptions({}));
+        queryClient.invalidateQueries(
+          trpc.workflows.getOne.queryFilter({ id: data.id })
+        );
+      },
+      onError: (error) => {
+        toast.error(`Failed to save workflow: ${error.message}`);
+      },
+    })
+  );
+};
