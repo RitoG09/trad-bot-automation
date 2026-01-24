@@ -9,7 +9,7 @@ export const ExecuteWorkflowButton = ({
 }) => {
   const executeWorkflow = useExecuteWorkflow();
   const handleSubmit = () => {
-    executeWorkflow.mutate({ id: workflowId }); 
+    executeWorkflow.mutate({ id: workflowId });
   };
   return (
     <Button
@@ -19,6 +19,6 @@ export const ExecuteWorkflowButton = ({
     >
       <FlaskConicalIcon />
       Execute workflow
-    </Button >
+    </Button>
   );
 };
