@@ -32,6 +32,12 @@ const triggerNodes: NodeTypeOption[] = [
     desc: "Runs the flow on clicking a button. Good for getting started quickly",
     icon: MousePointerIcon,
   },
+  {
+    type: NodeType.GOOGLE_FORM_TRIGGER,
+    label: "Google Form",
+    desc: "Runs the flow when a Google form is submitted",
+    icon: "/googleform.svg",
+  },
 ];
 
 const executionNodes: NodeTypeOption[] = [
@@ -61,7 +67,7 @@ export function NodeSelector({
       if (selection.type === NodeType.MANUAL_TRIGGER) {
         const nodes = getNodes();
         const hasManualTrigger = nodes.some(
-          (node) => node.type === NodeType.MANUAL_TRIGGER
+          (node) => node.type === NodeType.MANUAL_TRIGGER,
         );
         if (hasManualTrigger) {
           toast.error("Only one manual trigger is allowed per workflow");
@@ -70,7 +76,7 @@ export function NodeSelector({
       }
       setNodes((nodes) => {
         const hasInitialTrigger = nodes.some(
-          (node) => node.type === NodeType.INITIAL
+          (node) => node.type === NodeType.INITIAL,
         );
         const centerX = window.innerWidth / 2;
         const centerY = window.innerHeight / 2;
@@ -91,7 +97,7 @@ export function NodeSelector({
       });
       onOpenChange(false);
     },
-    [setNodes, getNodes, screenToFlowPosition]
+    [setNodes, getNodes, screenToFlowPosition],
   );
 
   return (
