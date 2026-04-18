@@ -4,6 +4,8 @@ import ky, { type Options as KyOptions } from "ky";
 import Handlebars from "handlebars";
 import { httpRequestChannel } from "@/app/inggest/channels/http-request";
 
+// variable name concept is added because without it when we have multiple http request nodes in a workflow we can't distinguish between them and it will show the last http request in the finalization step
+
 Handlebars.registerHelper("json", (context) => {
   const jsonString = JSON.stringify(context, null, 2);
   const safeString = new Handlebars.SafeString(jsonString);
@@ -16,7 +18,7 @@ type HttpRequestData = {
   method: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
   body?: string;
 };
-
+ 
 export const httpRequestExecutor: NodeExecutor<HttpRequestData> = async ({
   data,
   nodeId,
@@ -78,10 +80,10 @@ export const httpRequestExecutor: NodeExecutor<HttpRequestData> = async ({
       const responseData = contentType?.includes("application/json")
         ? await response.json()
         : await response.text();
-
+ 
       const responsePayload = {
         httpResponse: {
-          status: response.status,
+          status: response.status, 
           statusText: response.statusText,
           data: responseData,
         },
