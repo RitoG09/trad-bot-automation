@@ -13,12 +13,12 @@ Handlebars.registerHelper("json", (context) => {
 });
 
 type HttpRequestData = {
-  variableName: string;
-  endpoint: string;
-  method: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
+  variableName?: string;
+  endpoint?: string;
+  method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
   body?: string;
 };
- 
+
 export const httpRequestExecutor: NodeExecutor<HttpRequestData> = async ({
   data,
   nodeId,
@@ -32,35 +32,36 @@ export const httpRequestExecutor: NodeExecutor<HttpRequestData> = async ({
       status: "loading",
     }),
   );
-  if (!data.endpoint) {
-    await publish(
-      httpRequestChannel().status({
-        nodeId,
-        status: "error",
-      }),
-    );
-    throw new NonRetriableError("No endpoint configured");
-  }
-  if (!data.method) {
-    await publish(
-      httpRequestChannel().status({
-        nodeId,
-        status: "error",
-      }),
-    );
-    throw new NonRetriableError("No method configured");
-  }
-  if (!data.variableName) {
-    await publish(
-      httpRequestChannel().status({
-        nodeId,
-        status: "error",
-      }),
-    );
-    throw new NonRetriableError("No variable name configured");
-  }
+
   try {
     const result = await step.run("http-request", async () => {
+      if (!data.endpoint) {
+        await publish(
+          httpRequestChannel().status({
+            nodeId,
+            status: "error",
+          }),
+        );
+        throw new NonRetriableError("No endpoint configured");
+      }
+      if (!data.method) {
+        await publish(
+          httpRequestChannel().status({
+            nodeId,
+            status: "error",
+          }),
+        );
+        throw new NonRetriableError("No method configured");
+      }
+      if (!data.variableName) {
+        await publish(
+          httpRequestChannel().status({
+            nodeId,
+            status: "error",
+          }),
+        );
+        throw new NonRetriableError("No variable name configured");
+      }
       const endpoint = Handlebars.compile(data.endpoint)(context);
       console.log("ENDPOINT", endpoint);
       const method = data.method;
@@ -80,10 +81,10 @@ export const httpRequestExecutor: NodeExecutor<HttpRequestData> = async ({
       const responseData = contentType?.includes("application/json")
         ? await response.json()
         : await response.text();
- 
+
       const responsePayload = {
         httpResponse: {
-          status: response.status, 
+          status: response.status,
           statusText: response.statusText,
           data: responseData,
         },
